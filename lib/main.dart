@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -48,6 +49,11 @@ class _MyHomePageState extends State<MyHomePage> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _counter++;
+      if (_counter == 1000 ) {
+        _counter = 0;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(' FÄRDIG!!**!!**!!')));
+      }
       prefs.setInt('counter', _counter);
     });
   }
@@ -114,6 +120,10 @@ class _MyHomePageState extends State<MyHomePage> {
       title: Text('Vilket nummer skall hittas?'),
       content: TextField(
         controller: _controller,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+        ],
         onSubmitted: (String text) {
           int number = int.parse(text);
           setState(() {
