@@ -13,7 +13,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(primarySwatch: Colors.blueGrey),
-      debugShowCheckedModeBanner: false,
       home: MyHomePage(title: 'Platespotter'),
     );
   }
@@ -29,7 +28,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  int _counter = 1;
 
   //Loading counter value on start
   void _loadCounter() async {
@@ -66,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: [
           // action button
           IconButton(
-            icon: Icon(Icons.settings),
+            icon: Icon(Icons. settings),
             onPressed: () {
               _setCounter();
             },
@@ -83,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
             GestureDetector(
               onLongPress: _setCounter,
               child: Text(
-                '$_counter',
+                getTextForCounter(_counter),
                 style: Theme.of(context).textTheme.headline4,
               ),
             ),
@@ -154,4 +153,10 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
+}
+
+String getTextForCounter(int counter) {
+  var text = counter.toString();
+  while (text.length < 3) text = '0' + text;
+  return text;
 }
