@@ -1,20 +1,39 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() {
+  //WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   // This widget is the root of your application.
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Platespot',
-      theme: ThemeData(primarySwatch: Colors.blueGrey),
-      home: MyHomePage(title: 'Platespot'),
+    return FutureBuilder(
+      future: _initialization,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return MaterialApp(
+            title: 'Platespot',
+            theme: ThemeData(primarySwatch: Colors.blueGrey),
+            home: MyHomePage(title: 'Platespot'),
+          );
+        }
+      }
     );
   }
 }
@@ -30,10 +49,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 1;
-
   //Loading counter value on start
   void _loadCounter() async {
     final prefs = await SharedPreferences.getInstance();
+    //final firebaseAuth = FirebaseAuth.instance;
+    //var user = await firebaseAuth.currentUser;
+    //print(user.toString());
     setState(() {
       _counter = (prefs.getInt('counter') ?? 1);
     });
@@ -50,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _counter++;
       if (_counter == 1000) {
-        _counter = 0;
+        _counter = 1;
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(' FÄRDIG!!**!!**!!')));
       }
