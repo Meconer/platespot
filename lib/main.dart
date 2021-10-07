@@ -5,8 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-void main() {
-  //WidgetsFlutterBinding.ensureInitialized();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
@@ -17,28 +17,53 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
 
-  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  final _initialization = Firebase.initializeApp();
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: _initialization,
       builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return ErrPage(
+            text: 'Firebase init error',
+          );
+
+        }
         if (snapshot.connectionState == ConnectionState.done) {
-          return MaterialApp(
+          return MyHomePage(
             title: 'Platespot',
-            theme: ThemeData(primarySwatch: Colors.blueGrey),
-            home: MyHomePage(title: 'Platespot'),
           );
         }
+        return CircularProgressIndicator();
       }
     );
   }
+
+}
+
+class ErrPage extends StatelessWidget {
+  const ErrPage({Key key, this.text}) : super(key: key);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Text('FEL: $text'),
+        ),
+      ),
+    );
+
+  }
+
 }
 
 class MyHomePage extends StatefulWidget {
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
@@ -81,94 +106,96 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: Drawer(
-        child: SafeArea(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: <Widget>[
-              SizedBox(
-                height: 50,
-                child: Container(
-                  color: Colors.blue,
-                  child: const Center(
-                    child: Text(
-                      'Meny',
-                      style: TextStyle(color: Colors.white),
+    return MaterialApp(
+      home: Scaffold(
+        drawer: Drawer(
+          child: SafeArea(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: <Widget>[
+                SizedBox(
+                  height: 50,
+                  child: Container(
+                    color: Colors.blue,
+                    child: const Center(
+                      child: Text(
+                        'Meny',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ),
                 ),
+                ListTile(
+                  title: const Text('Ställ in nästa nummer'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _setCounter();
+                  },
+                ),
+                ListTile(
+                  title: const Text('Om'),
+                  onTap: () {
+                    _showVersion();
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                'Nummer att leta efter:',
+                style: TextStyle(
+                  fontWeight: FontWeight.w300,
+                  fontSize: 30,
+                )
               ),
-              ListTile(
-                title: const Text('Ställ in nästa nummer'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _setCounter();
-                },
+              GestureDetector(
+                onLongPress: _setCounter,
+                child: Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Text(
+                    getTextForCounter(_counter),
+                    style: Theme.of(context).textTheme.headline1,
+                  ),
+                ),
               ),
-              ListTile(
-                title: const Text('Om'),
-                onTap: () {
-                  _showVersion();
-                },
+              TextButton(
+                child: Text('Hittat'),
+                style: TextButton.styleFrom(
+                  primary: Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  elevation: 10,
+                  shape: RoundedRectangleBorder( borderRadius: BorderRadius.all(Radius.circular(10)),),
+                   textStyle: TextStyle(
+                     fontSize: 50,
+                     fontWeight: FontWeight.w300,
+                   ),
+                ),
+                onPressed: _incrementCounter,
               ),
             ],
           ),
         ),
+        // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        // floatingActionButton: SizedBox(
+        //   width: 200,
+        //   child: FittedBox(
+        //     child: FloatingActionButton.extended(
+        //       onPressed: _incrementCounter,
+        //       tooltip: 'Hittat',
+        //       icon: Icon(Icons.add),
+        //       label: Text('Hittat'),
+        //     ),
+        //   ),
+        //),
       ),
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Nummer att leta efter:',
-              style: TextStyle(
-                fontWeight: FontWeight.w300,
-                fontSize: 30,
-              )
-            ),
-            GestureDetector(
-              onLongPress: _setCounter,
-              child: Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: Text(
-                  getTextForCounter(_counter),
-                  style: Theme.of(context).textTheme.headline1,
-                ),
-              ),
-            ),
-            TextButton(
-              child: Text('Hittat'),
-              style: TextButton.styleFrom(
-                primary: Colors.white,
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                elevation: 10,
-                shape: RoundedRectangleBorder( borderRadius: BorderRadius.all(Radius.circular(10)),),
-                 textStyle: TextStyle(
-                   fontSize: 50,
-                   fontWeight: FontWeight.w300,
-                 ),
-              ),
-              onPressed: _incrementCounter,
-            ),
-          ],
-        ),
-      ),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      // floatingActionButton: SizedBox(
-      //   width: 200,
-      //   child: FittedBox(
-      //     child: FloatingActionButton.extended(
-      //       onPressed: _incrementCounter,
-      //       tooltip: 'Hittat',
-      //       icon: Icon(Icons.add),
-      //       label: Text('Hittat'),
-      //     ),
-      //   ),
-      //),
     );
   }
 
