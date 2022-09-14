@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:platespot/StatPage.dart';
+import 'package:platespot/spotting.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -20,7 +22,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -47,6 +49,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _incrementCounter() async {
     final prefs = await SharedPreferences.getInstance();
+    Spotting spotting =
+        Spotting(spotNumber: _counter, spottingTime: DateTime.now());
+    spotting.storeInDb();
     setState(() {
       _counter++;
       if (_counter == 1000) {
@@ -91,6 +96,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   _showVersion();
                 },
               ),
+              ListTile(
+                title: const Text('Statistik'),
+                onTap: () {
+                  _showStatistics();
+                },
+              ),
             ],
           ),
         ),
@@ -102,13 +113,11 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'Nummer att leta efter:',
-              style: TextStyle(
-                fontWeight: FontWeight.w300,
-                fontSize: 30,
-              )
-            ),
+            Text('Nummer att leta efter:',
+                style: TextStyle(
+                  fontWeight: FontWeight.w300,
+                  fontSize: 30,
+                )),
             GestureDetector(
               onLongPress: _setCounter,
               child: Padding(
@@ -122,32 +131,22 @@ class _MyHomePageState extends State<MyHomePage> {
             TextButton(
               child: Text('Hittat'),
               style: TextButton.styleFrom(
-                primary: Colors.white,
+                foregroundColor: Colors.white,
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 elevation: 10,
-                shape: RoundedRectangleBorder( borderRadius: BorderRadius.all(Radius.circular(10)),),
-                 textStyle: TextStyle(
-                   fontSize: 50,
-                   fontWeight: FontWeight.w300,
-                 ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+                textStyle: TextStyle(
+                  fontSize: 50,
+                  fontWeight: FontWeight.w300,
+                ),
               ),
               onPressed: _incrementCounter,
             ),
           ],
         ),
       ),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      // floatingActionButton: SizedBox(
-      //   width: 200,
-      //   child: FittedBox(
-      //     child: FloatingActionButton.extended(
-      //       onPressed: _incrementCounter,
-      //       tooltip: 'Hittat',
-      //       icon: Icon(Icons.add),
-      //       label: Text('Hittat'),
-      //     ),
-      //   ),
-      //),
     );
   }
 
@@ -216,6 +215,14 @@ class _MyHomePageState extends State<MyHomePage> {
         content: Text(versionText),
       ),
     );
+  }
+
+  Future<void> _showStatistics() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => StatPage()),
+    );
+    Navigator.pop(context);
   }
 }
 
