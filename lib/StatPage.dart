@@ -1,7 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:platespot/constants.dart';
+import 'package:platespot/statistics.dart';
 import 'spotting.dart';
 
 class StatPage extends StatelessWidget {
@@ -35,45 +34,45 @@ class StatPage extends StatelessWidget {
 
   Widget getStatWidget(List<Spotting> spotList) {
     final firstSpot = getFirstSpot(spotList);
-    final lastSpot = getLastSpot(spotList);
-    final interval = lastSpot.spottingTime.difference(firstSpot.spottingTime);
-    final intervalInDays = interval.inDays;
-    final intervalInHours = (interval - Duration(days: intervalInDays)).inHours;
-
-    final timeBetweenSpots =
-        calcAverageTimeBetweenSpotsInHours(firstSpot, lastSpot) / 24;
-    String avgStr = timeBetweenSpots.toString();
-    int decPos = avgStr.indexOf('.');
-    if (decPos >= 0) {
-      int l = avgStr.length;
-      avgStr = avgStr.substring(0, min(decPos + 3, l));
-    }
-
-    final remainingTime = calcRemainingTimeInDays(firstSpot, lastSpot).round();
+    final latestSpot = getLastSpot(spotList);
+    final statistics = Statistics(firstSpot: firstSpot, latestSpot: latestSpot);
 
     return Column(
       children: [
-        StatText(firstSpot, 'Första registrerade spot'),
-        StatText(lastSpot, 'Senaste registrerade spot'),
         NumberText(
-          title: 'Tid mellan första och senaste spot',
-          text: '$intervalInDays dagar och $intervalInHours timmar',
+          title: 'Första registrerade spot',
+          text: statistics.getFirstSpotText(),
         ),
         NumberText(
-            title: 'Genomsnittlig tid mellan spots', text: '$avgStr dagar'),
-        NumberText(title: 'Återstående tid', text: '$remainingTime dagar'),
+          title: 'Senaste registrerade spot',
+          text: statistics.getLatestSpotText(),
+        ),
         NumberText(
-            title: 'Färdigdatum',
-            text: '${formattedDate(finishTime(remainingTime))}')
+          title: 'Tid mellan första och senaste spot',
+          text: statistics.getIntervalText(),
+        ),
+        NumberText(
+          title: 'Genomsnittlig tid mellan spots',
+          text: statistics.getTextForAverageTimeBetweenSpottings(),
+        ),
+        NumberText(
+          title: 'Återstående tid',
+          text: statistics.getTextForRemainingDays(),
+        ),
+        NumberText(
+          title: 'Färdigdatum',
+          text: statistics.getTextForFinishedDate(),
+        )
       ],
     );
   }
 
   Spotting getFirstSpot(List<Spotting> spotList) {
-    var firstSpotting =
-        Spotting(spotNumber: 9999, spottingTime: DateTime.now());
+    Spotting firstSpotting = emptySpotting;
+    var lowestSpotNr = 9999;
     for (final spot in spotList) {
-      if (spot.spotNumber < firstSpotting.spotNumber) {
+      if (spot.spotNumber < lowestSpotNr) {
+        lowestSpotNr = spot.spotNumber;
         firstSpotting = spot.copy();
       }
     }
@@ -81,7 +80,7 @@ class StatPage extends StatelessWidget {
   }
 
   Spotting getLastSpot(List<Spotting> spotList) {
-    var lastSpotting = Spotting(spotNumber: 0, spottingTime: DateTime(0));
+    var lastSpotting = emptySpotting;
     for (final spot in spotList) {
       if (spot.spotNumber > lastSpotting.spotNumber) {
         lastSpotting = spot.copy();
@@ -89,33 +88,6 @@ class StatPage extends StatelessWidget {
     }
     return lastSpotting;
   }
-
-  double calcRemainingTimeInDays(Spotting firstSpot, Spotting lastSpot) {
-    final avgTimeBetweenSpots =
-        calcAverageTimeBetweenSpotsInHours(firstSpot, lastSpot);
-    lastSpot.spottingTime.difference(firstSpot.spottingTime);
-    final noInterval = lastSpot.spotNumber - firstSpot.spotNumber;
-    if (noInterval > 0) {
-      final remainingTimeInHours =
-          (999 - lastSpot.spotNumber) * avgTimeBetweenSpots;
-      return (remainingTimeInHours / 24).roundToDouble();
-    }
-    return 0;
-  }
-
-  double calcAverageTimeBetweenSpotsInHours(
-      Spotting firstSpot, Spotting lastSpot) {
-    final timeInterval =
-        lastSpot.spottingTime.difference(firstSpot.spottingTime);
-    final noInterval = lastSpot.spotNumber - firstSpot.spotNumber;
-    if (noInterval <= 0) return 0;
-    final averageTimeBetweenSpots = timeInterval.inHours / noInterval;
-    return averageTimeBetweenSpots;
-  }
-}
-
-DateTime finishTime(int remainingDays) {
-  return DateTime.now().add(Duration(days: remainingDays));
 }
 
 class NumberText extends StatelessWidget {
@@ -139,41 +111,6 @@ class NumberText extends StatelessWidget {
           style: TextStyle(fontSize: 24),
         ),
       ]),
-    );
-  }
-}
-
-String formattedDateTime(DateTime dateTime) {
-  final formatter = DateFormat('yyyy-MM-dd HH:mm');
-  return formatter.format(dateTime);
-}
-
-String formattedDate(DateTime dateTime) {
-  final formatter = DateFormat('yyyy-MM-dd');
-  return formatter.format(dateTime);
-}
-
-class StatText extends StatelessWidget {
-  final Spotting spotting;
-  final String title;
-  StatText(this.spotting, this.title);
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(24),
-      child: Column(
-        children: [
-          Text(title),
-          Text(
-            spotting.spotNumber.toString(),
-            style: TextStyle(fontSize: 24),
-          ),
-          Text(
-            formattedDateTime(spotting.spottingTime),
-            style: TextStyle(fontSize: 18),
-          )
-        ],
-      ),
     );
   }
 }

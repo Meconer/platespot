@@ -1,3 +1,4 @@
+import 'package:platespot/constants.dart';
 import 'package:platespot/platespotdb.dart';
 
 class Spotting {
@@ -30,4 +31,8 @@ class Spotting {
         spotNumber: data["spotNr"],
         spottingTime: DateTime.parse(data["timestamp"]),
       );
+
+  bool isRegistered() {
+    return spotNumber != emptySpotting.spotNumber;
+  }
 }
