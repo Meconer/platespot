@@ -124,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: const EdgeInsets.all(32.0),
                 child: Text(
                   getTextForCounter(_counter),
-                  style: Theme.of(context).textTheme.headline1,
+                  style: Theme.of(context).textTheme.displayLarge,
                 ),
               ),
             ),
