@@ -4,13 +4,14 @@ import 'package:intl/intl.dart';
 import 'package:platespot/spotting.dart';
 
 class Statistics {
-  Spotting firstSpot;
-  Spotting latestSpot;
+  final Spotting firstSpot;
+  final Spotting latestSpot;
+  final Spotting secondLastSpot;
 
-  Statistics({
-    required this.firstSpot,
-    required this.latestSpot,
-  });
+  Statistics(
+      {required this.firstSpot,
+      required this.latestSpot,
+      required this.secondLastSpot});
 
   String getFirstSpotText() {
     if (!firstSpot.isRegistered()) {
@@ -52,12 +53,28 @@ class Statistics {
     return '$avgStr dagar';
   }
 
+  String getTextForTimeBetweenLastTwoSpottings() {
+    if (!secondLastSpot.isRegistered()) return '-';
+    if (!latestSpot.isRegistered()) return '-';
+    if (secondLastSpot.spotNumber == latestSpot.spotNumber) return '-';
+    final hoursBetweenSpottings =
+        calcAverageTimeBetweenSpotsInHours(secondLastSpot, latestSpot);
+    final daysBetweenSpottingsText = hoursBetweenSpottings / 24;
+    String avgStr = daysBetweenSpottingsText.toString();
+    int decPos = avgStr.indexOf('.');
+    if (decPos >= 0) {
+      int l = avgStr.length;
+      avgStr = avgStr.substring(0, min(decPos + 3, l));
+    }
+    return '$avgStr dagar';
+  }
+
   String getTextForRemainingDays() {
     if (!firstSpot.isRegistered()) return '-';
     if (!latestSpot.isRegistered()) return '-';
     if (firstSpot.spotNumber == latestSpot.spotNumber) return '-';
     final remainingHours = calcRemainingTimeInHours(firstSpot, latestSpot);
-    final remainingDays = remainingHours / 24.round();
+    final remainingDays = (remainingHours / 2.4).round() / 10.0;
     return '$remainingDays dagar';
   }
 

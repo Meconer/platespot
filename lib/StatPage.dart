@@ -35,7 +35,11 @@ class StatPage extends StatelessWidget {
   Widget getStatWidget(List<Spotting> spotList) {
     final firstSpot = getFirstSpot(spotList);
     final latestSpot = getLastSpot(spotList);
-    final statistics = Statistics(firstSpot: firstSpot, latestSpot: latestSpot);
+    final secondToLastSpot = getSpot(latestSpot.spotNumber - 1, spotList);
+    final statistics = Statistics(
+        firstSpot: firstSpot,
+        latestSpot: latestSpot,
+        secondLastSpot: secondToLastSpot);
 
     return Column(
       children: [
@@ -54,6 +58,10 @@ class StatPage extends StatelessWidget {
         NumberText(
           title: 'Genomsnittlig tid mellan spots',
           text: statistics.getTextForAverageTimeBetweenSpottings(),
+        ),
+        NumberText(
+          title: 'Tid mellan två senaste spots',
+          text: statistics.getTextForTimeBetweenLastTwoSpottings(),
         ),
         NumberText(
           title: 'Återstående tid',
@@ -87,6 +95,15 @@ class StatPage extends StatelessWidget {
       }
     }
     return lastSpotting;
+  }
+
+  Spotting getSpot(int spotNumber, List<Spotting> spotList) {
+    for (final spot in spotList) {
+      if (spot.spotNumber == spotNumber) {
+        return spot.copy();
+      }
+    }
+    return emptySpotting;
   }
 }
 
