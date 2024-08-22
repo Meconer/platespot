@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:platespot/StatPage.dart';
+import 'package:platespot/constants.dart';
 import 'package:platespot/spotting.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+// import 'package:package_info_plus/package_info_plus.dart';
 
 void main() {
   runApp(MyApp());
@@ -201,14 +202,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _showVersion() async {
     final scaffoldMsngr = ScaffoldMessenger.of(context);
-    final packageInfo = await PackageInfo.fromPlatform();
-    final buildNumber = packageInfo.buildNumber;
-    final buildVersion = packageInfo.version;
-    final versionText = packageInfo.appName +
-        " Ver: " +
-        buildVersion +
-        " Build: " +
-        buildNumber;
+    final buildVersion = appBuildVersion;
+    final buildNumber = appBuildNumber;
+    final versionText =
+        appName + " Ver: " + buildVersion + " Build: " + buildNumber;
     Navigator.of(context).pop();
     scaffoldMsngr.showSnackBar(
       SnackBar(

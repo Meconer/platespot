@@ -15,7 +15,11 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.6+6
+
+# Change version in constants.dart also so that the menu choice "Om" works. I used
+# the package_info_plus earlier to get this automatically but it had some problems
+# when changing versions so I just removed it and now do it manually. Less problems now! /Mats
+version: 1.0.7+7
 
 environment:
   sdk: '>=3.1.0 <4.0.0'
@@ -23,12 +27,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  intl: ^0.18.1
-  package_info_plus: ^4.1.0
-  path: ^1.8.3
-  shared_preferences: ^2.2.0
-  sqflite: ^2.3.0
-
+  intl: ^0.19.0
+  shared_preferences: ^2.3.2
+  sqflite: ^2.3.3+1
 dev_dependencies:
   flutter_test:
     sdk: flutter
