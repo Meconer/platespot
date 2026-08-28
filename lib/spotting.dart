@@ -21,16 +21,18 @@ class Spotting {
   }
 
   Spotting copy() {
-    final newSpot =
-        Spotting(spotNumber: spotNumber, spottingTime: spottingTime);
+    final newSpot = Spotting(
+      spotNumber: spotNumber,
+      spottingTime: spottingTime,
+    );
     return newSpot;
   }
 
   //to be used when converting the row into object
-  factory Spotting.fromMap(Map<String, dynamic> data) => new Spotting(
-        spotNumber: data["spotNr"],
-        spottingTime: DateTime.parse(data["timestamp"]),
-      );
+  factory Spotting.fromMap(Map<String, dynamic> data) => Spotting(
+    spotNumber: data["spotNr"],
+    spottingTime: DateTime.parse(data["timestamp"]),
+  );
 
   bool isRegistered() {
     return spotNumber != emptySpotting.spotNumber;

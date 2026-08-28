@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:platespot/StatPage.dart';
+import 'package:platespot/stat_page.dart';
 import 'package:platespot/constants.dart';
 import 'package:platespot/spotting.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -71,77 +71,85 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: Drawer(
-        child: SafeArea(
-          child: ListView(
-            padding: EdgeInsets.zero,
+    return SafeArea(
+      child: Scaffold(
+        drawer: Drawer(
+          child: SafeArea(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: <Widget>[
+                SizedBox(
+                  height: 50,
+                  child: Container(
+                    color: Colors.blue,
+                    child: const Center(
+                      child: Text(
+                        'Meny',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+                ListTile(
+                  title: const Text('Ställ in nästa nummer'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _setCounter();
+                  },
+                ),
+                ListTile(
+                  title: const Text('Om'),
+                  onTap: () {
+                    _showVersion();
+                  },
+                ),
+                ListTile(
+                  title: const Text('Statistik'),
+                  onTap: () {
+                    _showStatistics();
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+        appBar: AppBar(title: Text(widget.title)),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              SizedBox(
-                height: 50,
-                child: Container(
-                  color: Colors.blue,
-                  child: const Center(
-                    child: Text('Meny', style: TextStyle(color: Colors.white)),
+              Text(
+                'Nummer att leta efter:',
+                style: TextStyle(fontWeight: FontWeight.w300, fontSize: 30),
+              ),
+              GestureDetector(
+                onLongPress: _setCounter,
+                child: Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Text(
+                    getTextForCounter(_counter),
+                    style: Theme.of(context).textTheme.displayLarge,
                   ),
                 ),
               ),
-              ListTile(
-                title: const Text('Ställ in nästa nummer'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _setCounter();
-                },
-              ),
-              ListTile(
-                title: const Text('Om'),
-                onTap: () {
-                  _showVersion();
-                },
-              ),
-              ListTile(
-                title: const Text('Statistik'),
-                onTap: () {
-                  _showStatistics();
-                },
+              TextButton(
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  elevation: 10,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  textStyle: TextStyle(
+                    fontSize: 50,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+                onPressed: _incrementCounter,
+                child: Text('Hittat'),
               ),
             ],
           ),
-        ),
-      ),
-      appBar: AppBar(title: Text(widget.title)),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Nummer att leta efter:',
-              style: TextStyle(fontWeight: FontWeight.w300, fontSize: 30),
-            ),
-            GestureDetector(
-              onLongPress: _setCounter,
-              child: Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: Text(
-                  getTextForCounter(_counter),
-                  style: Theme.of(context).textTheme.displayLarge,
-                ),
-              ),
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                elevation: 10,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                textStyle: TextStyle(fontSize: 50, fontWeight: FontWeight.w300),
-              ),
-              onPressed: _incrementCounter,
-              child: Text('Hittat'),
-            ),
-          ],
         ),
       ),
     );
@@ -212,6 +220,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
 String getTextForCounter(int counter) {
   var text = counter.toString();
-  while (text.length < 3) text = '0' + text;
+  while (text.length < 3) {
+    text = '0$text';
+  }
   return text;
 }

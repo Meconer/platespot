@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:platespot/constants.dart';
 import 'package:platespot/statistics.dart';
+
 import 'spotting.dart';
 
 class StatPage extends StatelessWidget {
@@ -8,24 +9,25 @@ class StatPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Statistik'),
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          width: double.infinity,
-          color: Colors.lightBlue[200],
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: FutureBuilder<List<Spotting>>(
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(title: Text('Statistik')),
+        body: SingleChildScrollView(
+          child: Container(
+            width: double.infinity,
+            color: Colors.lightBlue[200],
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FutureBuilder<List<Spotting>>(
                 future: Spotting.getAllSpottingsFromDB(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return getStatWidget(snapshot.data!);
                   }
                   return Center(child: CircularProgressIndicator());
-                }),
+                },
+              ),
+            ),
           ),
         ),
       ),
@@ -37,9 +39,10 @@ class StatPage extends StatelessWidget {
     final latestSpot = getLastSpot(spotList);
     final secondToLastSpot = getSpot(latestSpot.spotNumber - 1, spotList);
     final statistics = Statistics(
-        firstSpot: firstSpot,
-        latestSpot: latestSpot,
-        secondLastSpot: secondToLastSpot);
+      firstSpot: firstSpot,
+      latestSpot: latestSpot,
+      secondLastSpot: secondToLastSpot,
+    );
 
     return Column(
       children: [
@@ -70,7 +73,7 @@ class StatPage extends StatelessWidget {
         NumberText(
           title: 'Färdigdatum',
           text: statistics.getTextForFinishedDate(),
-        )
+        ),
       ],
     );
   }
@@ -108,11 +111,7 @@ class StatPage extends StatelessWidget {
 }
 
 class NumberText extends StatelessWidget {
-  const NumberText({
-    Key? key,
-    required this.title,
-    required this.text,
-  }) : super(key: key);
+  const NumberText({super.key, required this.title, required this.text});
 
   final String title;
   final String text;
@@ -121,13 +120,12 @@ class NumberText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(24),
-      child: Column(children: [
-        Text(title),
-        Text(
-          text,
-          style: TextStyle(fontSize: 24),
-        ),
-      ]),
+      child: Column(
+        children: [
+          Text(title),
+          Text(text, style: TextStyle(fontSize: 24)),
+        ],
+      ),
     );
   }
 }
